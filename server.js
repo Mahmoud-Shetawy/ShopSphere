@@ -5,7 +5,8 @@ dotenv.config({path: "config.env"});
 
 const categoryRoutes = require("./router/categoryRoute");
 const dbConnection = require("./config/database");
-
+const ApiError = require("./utils/apiError");
+const globalError = require("./middleware/errorMiddleware");
 //Connect to MongoDb
 dbConnection();
 
@@ -20,10 +21,33 @@ if (process.env.NODE_ENV == "development") {
     console.log(`Mode : ${process.env.NODE_ENV}`);
 }
 
-// Route
+// Routes
 app.use("/api/v1/categories", categoryRoutes);
 
+// app.all("*", (req, res, next) => {
+//     // const err = new Error(`Can't find this route:  ${req.originalUrl}`);
+// });
+
+app.all("/{*any}", (req, res, next) => {
+    next(new ApiError(`Can't find this route:  ${req.originalUrl}`, 400));
+
+    // const err = new Error(`Can't find this route:  ${req.originalUrl}`);
+    // next(err.message);
+});
+// Global Error Handling Middleware
+app.use(globalError);
+
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`app running on Port ${PORT}`);
+});
+
+// handled Rejection outside express
+process.on("unhandledRejection", (err) => {
+    console.log(`UnhandledRejection Errors :${err.name} | ${err.message} `);
+
+    server.close(() => {
+        console.log(`Server Shutting...  `);
+        process.exit(1);
+    });
 });
