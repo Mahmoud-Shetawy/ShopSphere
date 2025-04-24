@@ -1,9 +1,12 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
+
 dotenv.config({path: "config.env"});
 
 const categoryRoutes = require("./router/categoryRoute");
+const subCategoryRoutes = require("./router/subCategoryRoute");
+const brandRoutes = require("./router/brandRoute");
 const dbConnection = require("./config/database");
 const ApiError = require("./utils/apiError");
 const globalError = require("./middleware/errorMiddleware");
@@ -16,17 +19,15 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-if (process.env.NODE_ENV == "development") {
+if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));
     console.log(`Mode : ${process.env.NODE_ENV}`);
 }
 
 // Routes
 app.use("/api/v1/categories", categoryRoutes);
-
-// app.all("*", (req, res, next) => {
-//     // const err = new Error(`Can't find this route:  ${req.originalUrl}`);
-// });
+app.use("/api/v1/subcategories", subCategoryRoutes);
+app.use("/api/v1/brands", brandRoutes);
 
 app.all("/{*any}", (req, res, next) => {
     next(new ApiError(`Can't find this route:  ${req.originalUrl}`, 400));
