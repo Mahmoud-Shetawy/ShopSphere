@@ -4,6 +4,7 @@ const brandSchema = new mongoose.Schema(
     {
         name: {
             type: String,
+            trim: true,
             required: [true, "brand required"],
             unique: [true, "brand must be unique"],
             minlength: [3, "Too Short brand name"],
@@ -17,4 +18,4 @@ const brandSchema = new mongoose.Schema(
     {timestamps: true}
 );
 
-module.exports = mongoose.model("brand", brandSchema);
+module.exports = mongoose.model("Brand", brandSchema);

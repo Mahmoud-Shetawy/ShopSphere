@@ -1,3 +1,18 @@
+const sendErrorForDiv = (err, res) => {
+    res.status(400).json({
+        status: err.status,
+        error: err,
+        message: err.message,
+        stack: err.stack,
+    });
+};
+const sendErrorForProd = (err, res) => {
+    res.status(400).json({
+        status: err.status,
+        message: err.message,
+    });
+};
+
 const globalError = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || "error";
@@ -6,21 +21,6 @@ const globalError = (err, req, res, next) => {
     } else {
         sendErrorForProd(err, res);
     }
-};
-
-const sendErrorForDiv = (err, res) => {
-    return res.status(400).json({
-        status: err.status,
-        error: err,
-        message: err.message,
-        stack: err.stack,
-    });
-};
-const sendErrorForProd = (err, res) => {
-    return res.status(400).json({
-        status: err.status,
-        message: err.message,
-    });
 };
 
 module.exports = globalError;

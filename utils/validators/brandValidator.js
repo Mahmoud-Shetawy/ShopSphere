@@ -1,5 +1,9 @@
 const {check} = require("express-validator");
+
+const slugify = require("slugify");
+
 const validatorMiddleware = require("../../middleware/validatorMiddleware");
+const Brand = require("../../models/brandModel");
 
 exports.getBrandValidator = [
     check("id").isMongoId().withMessage("Invalid Brand id format"),
@@ -13,7 +17,13 @@ exports.createBrandValidator = [
         .isLength({min: 3})
         .withMessage("Too Short Brand name")
         .isLength({max: 32})
-        .withMessage("Too Long Brand name"),
+        .withMessage("Too Long Brand name")
+        .custom(async (name) => {
+            const results = await Brand.find({slug: slugify(name)});
+            if (results.length > 0) {
+                throw new Error("name of Brand already in use!");
+            }
+        }),
     validatorMiddleware,
 ];
 exports.updataBrandValidator = [

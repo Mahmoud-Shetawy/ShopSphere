@@ -13,6 +13,7 @@ const SubCategorySchema = new mongoose.Schema(
         slug: {
             type: String,
             slug: slugify("name"),
+            lowercase: true,
         },
         category: {
             type: mongoose.Schema.ObjectId,
