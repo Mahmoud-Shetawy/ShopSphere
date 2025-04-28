@@ -46,7 +46,7 @@ const productSchema = new mongoose.Schema(
         images: [String],
         category: {
             type: mongoose.Schema.ObjectId,
-            ref: "Category",
+            ref: "category",
             required: [true, "product must be belong to category "],
         },
         subCategories: [
