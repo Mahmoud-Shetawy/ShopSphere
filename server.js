@@ -9,9 +9,11 @@ const categoryRoutes = require("./router/categoryRoute");
 const subCategoryRoutes = require("./router/subCategoryRoute");
 const brandRoutes = require("./router/brandRoute");
 const productRoutes = require("./router/productRoute");
+
 const dbConnection = require("./config/database");
 const ApiError = require("./utils/apiError");
 const globalError = require("./middleware/errorMiddleware");
+
 //Connect to MongoDb
 dbConnection();
 
@@ -35,10 +37,8 @@ app.use("/api/v1/products", productRoutes);
 
 app.all("/{*any}", (req, res, next) => {
     next(new ApiError(`Can't find this route:  ${req.originalUrl}`, 400));
-
-    // const err = new Error(`Can't find this route:  ${req.originalUrl}`);
-    // next(err.message);
 });
+
 // Global Error Handling Middleware
 app.use(globalError);
 

@@ -1,11 +1,6 @@
-const slugify = require("slugify");
-const asyncHandler = require("express-async-handler");
 const subCategory = require("../models/subCategoryModel");
-const ApiError = require("../utils/apiError");
-const ApiFeatures = require("../utils/apiFeatures");
 const factory = require("./handlersFactory");
 
-/////////////////////////////////////////////////////////////////////////////////////
 exports.createFilterObj = (req, res, next) => {
     let filterObject = {};
     if (req.params.categoryId) {
@@ -21,8 +16,6 @@ exports.setCategoryIdToBady = (req, res, next) => {
     }
     next();
 };
-
-/////////////////////////////////////////////////////////////////////////////////////
 
 // @desc    Get List of Categories
 // @route   GET  /api/v1/Categories

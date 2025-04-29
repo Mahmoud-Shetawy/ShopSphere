@@ -15,11 +15,8 @@ const {
     resizeImage,
 } = require("../services/brandService");
 
-// const subCategoriesRoute = require("./subCategoryRoute");
-
 const router = express.Router();
 
-// router.use("/:categoryId/subcategories", subCategoriesRoute);
 router
     .route("/")
     .get(getBrands)
@@ -29,4 +26,5 @@ router
     .get(getBrandValidator, getBrand)
     .put(getBrandImage, resizeImage, updataBrandValidator, updataBrand)
     .delete(deleteBrandValidator, deleteBrand);
+
 module.exports = router;

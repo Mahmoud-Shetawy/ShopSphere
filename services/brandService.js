@@ -1,17 +1,15 @@
 const asyncHandler = require("express-async-handler");
-const multer = require("multer");
 const {v4: uuidv4} = require("uuid");
-
 const sharp = require("sharp");
-const Brand = require("../models/brandModel");
-const factory = require("./handlersFactory");
 
 const {uploadSingleImage} = require("../middleware/uploadImageMiddleware");
+
+const Brand = require("../models/brandModel");
+const factory = require("./handlersFactory");
 
 exports.getBrandImage = uploadSingleImage("image");
 
 exports.resizeImage = asyncHandler(async (req, res, next) => {
-    // const ext = req.file.mimetype.split("/")[1];
     const fileName = `Brand-${uuidv4()}-${Date.now()}.jpeg`;
 
     await sharp(req.file.buffer)

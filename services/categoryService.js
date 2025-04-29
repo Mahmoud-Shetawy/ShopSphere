@@ -1,18 +1,15 @@
-const multer = require("multer");
+const asyncHandler = require("express-async-handler");
 const {v4: uuidv4} = require("uuid");
-
 const sharp = require("sharp");
 
-const asyncHandler = require("express-async-handler");
+const {uploadSingleImage} = require("../middleware/uploadImageMiddleware");
+
 const Category = require("../models/categoryModel");
 const factory = require("./handlersFactory");
-const ApiError = require("../utils/apiError");
-const {uploadSingleImage} = require("../middleware/uploadImageMiddleware");
 
 exports.getCategoryImage = uploadSingleImage("image");
 
 exports.resizeImage = asyncHandler(async (req, res, next) => {
-    // const ext = req.file.mimetype.split("/")[1];
     const fileName = `category-${uuidv4()}-${Date.now()}.jpeg`;
 
     await sharp(req.file.buffer)
@@ -23,6 +20,7 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
     req.body.image = fileName;
     next();
 });
+
 // @desc    Get List of Categories
 // @route   GET  /api/v1/Categories
 // access   public

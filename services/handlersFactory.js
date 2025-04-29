@@ -1,5 +1,5 @@
-const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
+
 const ApiError = require("../utils/apiError");
 const ApiFeatures = require("../utils/apiFeatures");
 
@@ -75,7 +75,6 @@ exports.getAll = (Model) =>
             .search(Model.modelName)
             .limitingFields()
             .paginate(documentCount);
-        
 
         const {mongooseQuery, paginateResult} = apiFeatures;
         const documents = await mongooseQuery;
