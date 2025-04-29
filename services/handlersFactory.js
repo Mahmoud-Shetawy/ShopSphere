@@ -75,10 +75,7 @@ exports.getAll = (Model) =>
             .search(Model.modelName)
             .limitingFields()
             .paginate(documentCount);
-        // .populate({
-        //     path: "category",
-        //     select: "name -_id",
-        // });
+        
 
         const {mongooseQuery, paginateResult} = apiFeatures;
         const documents = await mongooseQuery;

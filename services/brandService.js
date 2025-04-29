@@ -1,9 +1,28 @@
-const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
+const multer = require("multer");
+const {v4: uuidv4} = require("uuid");
+
+const sharp = require("sharp");
 const Brand = require("../models/brandModel");
-const ApiError = require("../utils/apiError");
-const ApiFeatures = require("../utils/apiFeatures");
 const factory = require("./handlersFactory");
+
+const {uploadSingleImage} = require("../middleware/uploadImageMiddleware");
+
+exports.getBrandImage = uploadSingleImage("image");
+
+exports.resizeImage = asyncHandler(async (req, res, next) => {
+    // const ext = req.file.mimetype.split("/")[1];
+    const fileName = `Brand-${uuidv4()}-${Date.now()}.jpeg`;
+
+    await sharp(req.file.buffer)
+        .resize(600, 600)
+        .toFormat("jpeg")
+        .jpeg({quality: 90})
+        .toFile(`uploads/brands/${fileName}`);
+    req.body.image = fileName;
+    next();
+});
+
 // @desc    Get List of Brands
 // @route   GET  /api/v1/Brands
 // access   public
