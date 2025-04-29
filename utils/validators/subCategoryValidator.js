@@ -1,4 +1,4 @@
-const {check} = require("express-validator");
+const {check, body} = require("express-validator");
 
 const slugify = require("slugify");
 
@@ -23,6 +23,10 @@ exports.createSubCategoryValidator = [
             if (results.length > 0) {
                 throw new Error("name of subCategory already in use.");
             }
+        })
+        .custom((value, {req}) => {
+            req.body.slug = slugify(value);
+            return true;
         }),
 
     check("category")
@@ -34,6 +38,10 @@ exports.createSubCategoryValidator = [
 ];
 exports.updataSubCategoryValidator = [
     check("id").isMongoId().withMessage("Invalid Subcategory id format"),
+    check("name").custom((value, {req}) => {
+        req.body.slug = slugify(value);
+        return true;
+    }),
     validatorMiddleware,
 ];
 exports.deleteSubCategoryValidator = [

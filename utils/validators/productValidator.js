@@ -1,4 +1,4 @@
-const {check} = require("express-validator");
+const {check, body} = require("express-validator");
 const slugify = require("slugify");
 
 const validatorMiddleware = require("../../middleware/validatorMiddleware");
@@ -17,6 +17,10 @@ exports.createProductValidator = [
             if (results.length > 0) {
                 throw new Error("title already in use ");
             }
+        })
+        .custom((value, {req}) => {
+            req.body.slug = slugify(value);
+            return true;
         }),
     check("description")
         .isLength({max: 2000})
@@ -134,6 +138,12 @@ exports.getProductValidator = [
 ];
 exports.updataProductValidator = [
     check("id").isMongoId().withMessage("invalid Id formate"),
+    check("title")
+        .optional()
+        .custom((value, {req}) => {
+            req.body.slug = slugify(value);
+            return true;
+        }),
     validatorMiddleware,
 ];
 exports.deleteProductValidator = [

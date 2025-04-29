@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const {default: slugify} = require("slugify");
+const slugify = require("slugify");
 
 const productSchema = new mongoose.Schema(
     {
@@ -71,5 +71,11 @@ const productSchema = new mongoose.Schema(
     },
     {timestamps: true}
 );
-
+productSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "category subCategories",
+        select: "-_id name",
+    });
+    next();
+});
 module.exports = mongoose.model("Product", productSchema);
