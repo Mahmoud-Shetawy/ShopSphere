@@ -1,11 +1,14 @@
 const asyncHandler = require("express-async-handler");
 const {v4: uuidv4} = require("uuid");
 const sharp = require("sharp");
+const bcrypt = require("bcryptjs");
 
 const {uploadSingleImage} = require("../middleware/uploadImageMiddleware");
 
+const ApiError = require("../utils/apiError");
 const User = require("../models/userModel");
 const factory = require("./handlersFactory");
+const {default: slugify} = require("slugify");
 
 //upload single image
 exports.getUserImage = uploadSingleImage("profileImg");
@@ -43,8 +46,53 @@ exports.createUser = factory.createOne(User);
 // @desc     Updata specific  User
 // @route   PUT  /api/v1/User/:id
 // access  Private
-exports.updataUser = factory.updateOne(User);
-
+exports.updateUser = asyncHandler(async (req, res, next) => {
+    const documents = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+            name: req.body.name,
+            email: req.body.name,
+            slug: slugify(req.body.name),
+            role: req.body.role,
+            phone: req.body.phone,
+            profileImg: req.body.profileImg,
+        },
+        {
+            new: true,
+        }
+    );
+    if (!documents) {
+        return next(
+            new ApiError(
+                `No ${User.modelName} For this id ${req.params.id}`,
+                404
+            )
+        );
+    }
+    res.status(200).json({
+        data: documents,
+    });
+});
+exports.changeUserPassword = asyncHandler(async (req, res, next) => {
+    const documents = await User.findByIdAndUpdate(
+        req.params.id,
+        {password: await bcrypt.hash(req.body.password, 12)},
+        {
+            new: true,
+        }
+    );
+    if (!documents) {
+        return next(
+            new ApiError(
+                `No ${User.modelName} For this id ${req.params.id}`,
+                404
+            )
+        );
+    }
+    res.status(200).json({
+        data: documents,
+    });
+});
 // @desc     Delete specific  User
 // @route   DELETE  /api/v1/User/:id
 // access  Private
