@@ -2,13 +2,13 @@ const asyncHandler = require("express-async-handler");
 const {v4: uuidv4} = require("uuid");
 const sharp = require("sharp");
 const bcrypt = require("bcryptjs");
+const slugify = require("slugify");
 
 const {uploadSingleImage} = require("../middleware/uploadImageMiddleware");
 
 const ApiError = require("../utils/apiError");
 const User = require("../models/userModel");
 const factory = require("./handlersFactory");
-const {default: slugify} = require("slugify");
 
 //upload single image
 exports.getUserImage = uploadSingleImage("profileImg");
@@ -76,11 +76,15 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 exports.changeUserPassword = asyncHandler(async (req, res, next) => {
     const documents = await User.findByIdAndUpdate(
         req.params.id,
-        {password: await bcrypt.hash(req.body.password, 12)},
+        {
+            password: await bcrypt.hash(req.body.password, 12),
+            passwordChangeAt: Date.now(),
+        },
         {
             new: true,
         }
     );
+
     if (!documents) {
         return next(
             new ApiError(

@@ -1,10 +1,10 @@
 const {check, body} = require("express-validator");
 
 const slugify = require("slugify");
+const bcrypt = require("bcryptjs");
 
 const validatorMiddleware = require("../../middleware/validatorMiddleware");
 const User = require("../../models/userModel");
-const bcrypt = require("bcryptjs");
 
 exports.createUserValidator = [
     check("name")
@@ -26,14 +26,13 @@ exports.createUserValidator = [
         .notEmpty()
         .withMessage("User Email require")
         .isEmail()
-        .withMessage("Invalid email address")
-        .custom(async (email) => {
-            const results = await User.findOne({slug: slugify(email)});
-            if (results) {
-                throw new Error("Email of user already in use!");
-            }
-        }),
-
+        .withMessage("Invalid email address"),
+    // .custom(async (email) => {
+    //     const results = await User.findOne({slug: slugify(email)});
+    //     if (results.length > 0) {
+    //         throw new Error("Email of user already in use!");
+    //     }
+    // }),
     check("password")
         .notEmpty()
         .withMessage("Password require")
@@ -87,7 +86,7 @@ exports.updateUserValidator = [
         .withMessage("Invalid email address")
         .custom(async (email) => {
             const results = await User.findOne({slug: slugify(email)});
-            if (results) {
+            if (results.length > 0) {
                 throw new Error("Email of user already in use!");
             }
         }),
@@ -116,7 +115,7 @@ exports.changeUserPasswordValidator = [
         .custom(async (newPassword, {req}) => {
             const user = await User.findById(req.params.id);
             if (!user) {
-                throw new Error("There no't user for this Id");
+                throw new Error("There no't user for this Id", 404);
             }
             const correctCurrentPassword = await bcrypt.compare(
                 req.body.currentPassword,
