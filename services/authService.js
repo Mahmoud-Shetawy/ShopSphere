@@ -7,11 +7,7 @@ const crypto = require("crypto");
 const ApiError = require("../utils/apiError");
 const User = require("../models/userModel");
 const sendEmail = require("../utils/sendEmail");
-
-const CreateToken = (payload) =>
-    jwt.sign({userId: payload}, process.env.JWT_SECRET_KEY, {
-        expiresIn: process.env.JWT_EXPIRE_TIME,
-    });
+const CreateToken = require("../utils/createToken");
 
 exports.signup = asyncHandler(async (req, res, next) => {
     const user = await User.create({
@@ -57,8 +53,10 @@ exports.protect = asyncHandler(async (req, res, next) => {
     }
 
     // 2) Verify token (no change happens, expired token)
-
+    console.log(token);
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    console.log("🚀💥 --> exports.protect=asyncHandler --> decoded:", decoded);
 
     // 3) Check if user exists
 

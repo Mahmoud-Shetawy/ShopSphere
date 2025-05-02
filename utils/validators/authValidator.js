@@ -60,11 +60,7 @@ exports.loginValidator = [
         .withMessage("User Email require")
         .isEmail()
         .withMessage("Invalid email address"),
-    check("password")
-        .notEmpty()
-        .withMessage("Password require")
-        .isLength({min: 8})
-        .withMessage("Password must be at least 8 characters"),
+    check("password").notEmpty().withMessage("Password require"),
 
     validatorMiddleware,
 ];

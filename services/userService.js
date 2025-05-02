@@ -9,6 +9,7 @@ const {uploadSingleImage} = require("../middleware/uploadImageMiddleware");
 const ApiError = require("../utils/apiError");
 const User = require("../models/userModel");
 const factory = require("./handlersFactory");
+const CreateToken = require("../utils/createToken");
 
 //upload single image
 exports.getUserImage = uploadSingleImage("profileImg");
@@ -51,7 +52,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
         req.params.id,
         {
             name: req.body.name,
-            email: req.body.name,
+            email: req.body.email,
             slug: slugify(req.body.name),
             role: req.body.role,
             phone: req.body.phone,
@@ -101,3 +102,64 @@ exports.changeUserPassword = asyncHandler(async (req, res, next) => {
 // @route   DELETE  /api/v1/User/:id
 // access  Private
 exports.deleteUser = factory.deleteOne(User);
+
+// @desc     Get logger User
+// @route   DELETE  /api/v1/User/getMe
+// access  Private
+exports.getLoggedUserDate = asyncHandler(async (req, res, next) => {
+    req.params.id = req.user._id;
+    next();
+});
+
+// @desc     Update logger User
+// @route   DELETE  /api/v1/User/updateMyPassword
+// access  Private
+exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            password: await bcrypt.hash(req.body.password, 12),
+            passwordChangeAt: Date.now(),
+        },
+        {
+            new: true,
+        }
+    );
+    const token = CreateToken(user._id);
+    res.status(200).json({data: user, token});
+});
+
+// @desc     Update logger User
+// @route   DELETE  /api/v1/User/updateMyPassword
+// access  Private
+exports.updateLoggedUserDate = asyncHandler(async (req, res, next) => {
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            name: req.body.name,
+            email: req.body.email,
+            slug: slugify(req.body.name),
+            phone: req.body.phone,
+        },
+        {
+            new: true,
+        }
+    );
+    res.status(200).json({data: user});
+});
+
+// @desc     delete logger User
+// @route   DELETE  /api/v1/User/deleteMe
+// access  Private
+exports.deleteLoggedUser = asyncHandler(async (req, res, next) => {
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            active: false,
+        },
+        {
+            new: true,
+        }
+    );
+    res.status(204).json({status: "Success"});
+});

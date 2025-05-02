@@ -5,6 +5,7 @@ const {
     updateUserValidator,
     deleteUserValidator,
     changeUserPasswordValidator,
+    updateLoggerValidator,
 } = require("../utils/validators/userValidator");
 const {
     createUser,
@@ -15,11 +16,24 @@ const {
     getUserImage,
     resizeImage,
     changeUserPassword,
+    getLoggedUserDate,
+    updateLoggedUserPassword,
+    updateLoggedUserDate,
+    deleteLoggedUser,
 } = require("../services/userService");
 
 const {protect, allowedTo} = require("../services/authService");
 
 const router = express.Router();
+
+router.use(protect);
+
+router.get("/getMe", getLoggedUserDate, getUser);
+router.put("/updateMyPassword", updateLoggedUserPassword);
+router.put("/updateMy", updateLoggerValidator, updateLoggedUserDate);
+router.put("/deleteMy", deleteLoggedUser);
+
+router.use(allowedTo("admin"));
 
 router.put(
     "/changePassword/:id",
@@ -29,25 +43,11 @@ router.put(
 router
     .route("/")
     .get(protect, allowedTo("admin"), getUsers)
-    .post(
-        protect,
-        allowedTo("admin"),
-        getUserImage,
-        resizeImage,
-        createUserValidator,
-        createUser
-    );
+    .post(getUserImage, resizeImage, createUserValidator, createUser);
 router
     .route("/:id")
     .get(getUserValidator, getUser)
-    .put(
-        protect,
-        allowedTo("admin"),
-        getUserImage,
-        resizeImage,
-        updateUserValidator,
-        updateUser
-    )
-    .delete(protect, allowedTo("admin"), deleteUserValidator, deleteUser);
+    .put(getUserImage, resizeImage, updateUserValidator, updateUser)
+    .delete(deleteUserValidator, deleteUser);
 
 module.exports = router;
